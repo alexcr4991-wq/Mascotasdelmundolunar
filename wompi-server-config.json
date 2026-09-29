@@ -1,0 +1,8 @@
+{
+  "environment": "production",
+  "publicKey": "pub_prod_DA3WRqZtZJxBABQ5OSD7t5UBqOF5iQa6",
+  "privateKey": "prv_prod_BOFMkZSHBkFsQG8i80oqwJYejWtcczEH",
+  "integritySecret": "prod_integrity_5DRIk4DC8wy8EFQOd5XUEVzQucW8k40W",
+  "eventsSecret": "prod_events_6HgTx5z2s8gOzBgjqxEAohuX8hXWnr4K",
+  "paymentLink": "https://checkout.wompi.co/l/VPOS_Qn5COa"
+}

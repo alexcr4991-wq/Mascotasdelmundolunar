@@ -1,0 +1,6 @@
+{
+  "name": "Lunary World Pets Store",
+  "description": "Tienda virtual de mascotas colombiana con pasarela de pagos Wompi (Bancolombia, PSE, Tarjetas y Nequi), checkout seguro, catálogo con fotos y stock editable, base de datos de clientes y exportación de reportes diarios en Excel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,109 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Store product item for pets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "category": { "type": "string" },
+        "petType": { "type": "string", "enum": ["perro", "gato", "ambos"] },
+        "price": { "type": "number" },
+        "originalPrice": { "type": "number" },
+        "description": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "image": { "type": "string" },
+        "inStock": { "type": "boolean" },
+        "stockCount": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "brand": { "type": "string" },
+        "sku": { "type": "string" },
+        "weight": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "price", "category"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "iconName": { "type": "string" },
+        "petType": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["id", "name", "slug"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderNumber": { "type": "string" },
+        "subtotal": { "type": "number" },
+        "shippingCost": { "type": "number" },
+        "total": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "orderNumber", "total", "status"]
+    },
+    "CustomerLead": {
+      "title": "CustomerLead",
+      "description": "Customer contact inquiry or lead",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "phone"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Global store settings like contact info and about content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "value": { "type": "object" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Store pet products catalog"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Store product categories"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer orders and checkout transactions"
+    },
+    "/customer_leads/{leadId}": {
+      "schema": "CustomerLead",
+      "description": "Customer inquiry leads and requests"
+    },
+    "/settings/{settingId}": {
+      "schema": "Setting",
+      "description": "Global store settings like contact info and about content"
+    }
+  }
+}

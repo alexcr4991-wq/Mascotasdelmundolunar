@@ -1,0 +1,14 @@
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://ais-pre-plhylrlm7ulcetruuzpnp5-668220432504.us-east1.run.app/sitemap.xml
