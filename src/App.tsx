@@ -83,6 +83,7 @@ import { TikTokReelModal } from './components/TikTokReelModal';
 import { Footer } from './components/Footer';
 import { LegalPoliciesModal, LegalPolicyTab } from './components/LegalPoliciesModal';
 import { NotificationToast } from './components/NotificationToast';
+import { CamilaChatWidget } from './components/CamilaChatWidget';
 import { formatCOP, formatPhoneNumber } from './utils/formatters';
 
 export default function App() {
@@ -1124,6 +1125,19 @@ export default function App() {
         onClose={handleClosePolicy}
         initialTab={activeLegalTab}
         contactInfo={contactInfo}
+      />
+
+      {/* Camila Virtual Advisor Chatbot Widget with CRM & Sales Synchronization */}
+      <CamilaChatWidget
+        contactInfo={contactInfo}
+        products={products}
+        onOpenCatalog={() => {
+          setActiveSection('catalog');
+          const el = document.getElementById('catalog-products-container');
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        onOpenCart={() => handleOpenCart('cart')}
+        onAddToCart={(prod) => handleAddToCart(prod, 1)}
       />
     </div>
   );
