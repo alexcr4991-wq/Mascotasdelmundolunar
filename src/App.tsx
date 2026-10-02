@@ -104,6 +104,7 @@ export default function App() {
   const [selectedPetType, setSelectedPetType] = useState<PetType>('ambos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'featured' | 'price_asc' | 'price_desc' | 'name'>('featured');
+  const [bestsellerFilter, setBestsellerFilter] = useState<string>('all');
 
   // UI Drawers & Modals
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -597,11 +598,21 @@ export default function App() {
     });
   }, [products, selectedPetType, selectedCategory, searchQuery, sortBy]);
 
-  // Featured products for the highlighted top section matching the reference image
-  const featuredProducts = useMemo(() => {
-    const featured = products.filter((p) => p.isFeatured || p.rating && p.rating >= 4.8);
-    return featured.length > 0 ? featured.slice(0, 4) : products.slice(0, 4);
-  }, [products]);
+  // Bestseller products for the section matching "Our bestsellers" in reference image
+  const bestsellerProducts = useMemo(() => {
+    let list = products.filter((p) => p.isFeatured || (p.rating && p.rating >= 4.7));
+    if (list.length === 0) list = products;
+    if (bestsellerFilter !== 'all') {
+      const filteredByCat = list.filter((p) => p.category?.toLowerCase() === bestsellerFilter.toLowerCase());
+      if (filteredByCat.length > 0) {
+        list = filteredByCat;
+      } else {
+        const fallbackByCat = products.filter((p) => p.category?.toLowerCase() === bestsellerFilter.toLowerCase());
+        if (fallbackByCat.length > 0) list = fallbackByCat;
+      }
+    }
+    return list.slice(0, 4);
+  }, [products, bestsellerFilter]);
 
   const totalCartItemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -650,6 +661,7 @@ export default function App() {
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
               onExploreAbout={() => handleNavigateSection('about')}
+              onSelectPetType={setSelectedPetType}
             />
 
             {/* Category Pills Bar (Alimentos, Juguetes, Higiene, Camas, Accesorios, Snacks) */}
@@ -661,7 +673,7 @@ export default function App() {
 
             {/* Interactive Tool Banner: Calculadora de Racionamiento de Alimento */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-              <div className="bg-linear-to-r from-[#1C2722] to-[#2B3B34] rounded-3xl p-5 sm:p-7 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+              <div className="bg-gradient-to-r from-[#212E27] via-[#2D3E35] to-[#395043] rounded-3xl p-5 sm:p-7 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-md relative overflow-hidden border border-[#405A4B]">
                 <div className="space-y-1.5 text-center md:text-left z-10">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-amber-300 text-xs font-bold backdrop-blur-xs">
                     <span>✨</span>
@@ -670,7 +682,7 @@ export default function App() {
                   <h3 className="text-xl sm:text-2xl font-black text-white">
                     Calculadora de Racionamiento de Alimento 🥣
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-200 max-w-xl">
+                  <p className="text-xs sm:text-sm text-stone-200 max-w-xl">
                     Descubre exactamente cuántos gramos diarios necesita tu peludo según su peso y nivel de actividad, y cuánto te durará cada bulto.
                   </p>
                 </div>
@@ -679,7 +691,7 @@ export default function App() {
                   <button
                     id="open-food-calculator-banner-btn"
                     onClick={() => setIsFoodCalculatorOpen(true)}
-                    className="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm shadow-lg flex items-center gap-2 hover:scale-104 transition-all"
+                    className="px-6 py-3.5 rounded-full bg-[#E5B54F] hover:bg-[#D4A33D] text-[#1C1F1E] font-black text-xs sm:text-sm shadow-md flex items-center gap-2 hover:scale-103 transition-all cursor-pointer"
                   >
                     <span>Calcular Ración de mi Mascota</span>
                     <ArrowRight className="w-4 h-4" />
@@ -693,43 +705,82 @@ export default function App() {
               </div>
             </section>
 
-            {/* FEATURED PRODUCTS SECTION (Matching the exact "🐾 Productos destacados" row in image) */}
-            {!selectedCategory && !searchQuery && featuredProducts.length > 0 && (
-              <section id="featured-products-section" className="py-10 bg-white border-b border-[#F0EBE3]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* BESTSELLERS SECTION (Matching "Our bestsellers" in Reference Image) */}
+            {!selectedCategory && !searchQuery && bestsellerProducts.length > 0 && (
+              <section id="featured-products-section" className="py-10 bg-white border-y border-[#ECE5DD]">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                   
-                  {/* Section Title & Subtitle matching the reference image */}
-                  <div className="flex items-center justify-between mb-6">
+                  {/* Section Title & Subtitle + Category Filter Pills matching Reference Image */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl select-none text-[#B97A48]">🐾</span>
-                        <h2 className="text-xl sm:text-2xl font-bold text-[#1C1F1E]">
-                          Productos destacados
-                        </h2>
-                      </div>
-                      <p className="text-xs sm:text-sm text-[#707572]">
-                        Lo más querido por nuestras mascotas
-                      </p>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#6B7B3E] block">
+                        Favoritos de la Tienda
+                      </span>
+                      <h2 className="text-2xl sm:text-3xl font-black text-[#1C1F1E] tracking-tight">
+                        Nuestros más vendidos
+                      </h2>
                     </div>
 
-                    <button
-                      id="view-all-products-link"
-                      onClick={() => {
-                        const el = document.getElementById('catalog-products-container');
-                        el?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="text-xs sm:text-sm font-bold text-[#1C1F1E] hover:text-[#B97A48] flex items-center gap-1 group transition-colors"
-                    >
-                      <span>Ver todos</span>
-                      <span className="group-hover:translate-x-1 transition-transform">→</span>
-                    </button>
+                    {/* Filter Pills matching the reference image right buttons */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+                      <button
+                        onClick={() => setBestsellerFilter('all')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          bestsellerFilter === 'all'
+                            ? 'bg-[#1C1F1E] text-white shadow-2xs'
+                            : 'bg-[#F5F2EB] hover:bg-[#EAE4D9] text-[#4A4F4C]'
+                        }`}
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => setBestsellerFilter('alimentos')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          bestsellerFilter === 'alimentos'
+                            ? 'bg-[#1C1F1E] text-white shadow-2xs'
+                            : 'bg-[#F5F2EB] hover:bg-[#EAE4D9] text-[#4A4F4C]'
+                        }`}
+                      >
+                        Alimentos
+                      </button>
+                      <button
+                        onClick={() => setBestsellerFilter('juguetes')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          bestsellerFilter === 'juguetes'
+                            ? 'bg-[#1C1F1E] text-white shadow-2xs'
+                            : 'bg-[#F5F2EB] hover:bg-[#EAE4D9] text-[#4A4F4C]'
+                        }`}
+                      >
+                        Juguetes
+                      </button>
+                      <button
+                        onClick={() => setBestsellerFilter('higiene')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          bestsellerFilter === 'higiene'
+                            ? 'bg-[#1C1F1E] text-white shadow-2xs'
+                            : 'bg-[#F5F2EB] hover:bg-[#EAE4D9] text-[#4A4F4C]'
+                        }`}
+                      >
+                        Higiene
+                      </button>
+                      <button
+                        onClick={() => setBestsellerFilter('camas')}
+                        className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          bestsellerFilter === 'camas'
+                            ? 'bg-[#1C1F1E] text-white shadow-2xs'
+                            : 'bg-[#F5F2EB] hover:bg-[#EAE4D9] text-[#4A4F4C]'
+                        }`}
+                      >
+                        Camas
+                      </button>
+                    </div>
                   </div>
 
                   {/* 4-Column Featured Cards Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                    {featuredProducts.map((product) => (
+                    {bestsellerProducts.map((product) => (
                       <ProductCard
-                        key={`featured-${product.id}`}
+                        key={`bestseller-${product.id}`}
                         product={product}
                         whatsappPhone={contactInfo.whatsapp}
                         onAddToCart={(prod) => handleAddToCart(prod, 1)}
@@ -769,7 +820,7 @@ export default function App() {
                       id="product-sort-select"
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as any)}
-                      className="bg-white border border-[#DDD5C9] text-xs font-semibold text-[#1C1F1E] rounded-xl px-3 py-2 outline-none focus:border-[#1C2722]"
+                      className="bg-white border border-[#E2DBD0] text-xs font-semibold text-[#1C1F1E] rounded-full px-4 py-2 outline-none focus:border-[#6B7B3E] shadow-2xs cursor-pointer"
                     >
                       <option value="featured">⭐ Destacados</option>
                       <option value="price_asc">💰 Menor precio</option>
@@ -781,10 +832,10 @@ export default function App() {
                     <button
                       id="catalog-admin-shortcut-btn"
                       onClick={() => setIsAdminOpen(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#FAF6F0] hover:bg-[#EFE9DF] border border-[#DED7CB] rounded-xl text-xs font-bold text-[#1C1F1E] transition-colors"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-[#F5F2EB] border border-[#E2DBD0] rounded-full text-xs font-bold text-[#1C1F1E] transition-all shadow-2xs hover:scale-102 cursor-pointer"
                       title="Abrir panel para añadir o editar productos"
                     >
-                      <Plus className="w-3.5 h-3.5 text-[#B97A48]" />
+                      <Plus className="w-3.5 h-3.5 text-[#6B7B3E]" />
                       <span className="hidden sm:inline">Gestionar / Agregar</span>
                     </button>
                   </div>

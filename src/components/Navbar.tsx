@@ -4,18 +4,17 @@ import {
   Search,
   User,
   ChevronDown,
-  Phone,
   Menu,
   X,
-  Sparkles,
-  ShieldCheck,
+  Phone,
+  Truck,
   Heart,
-  Dog,
-  Cat,
-  Lock,
+  Globe,
+  Instagram,
+  Facebook,
+  MessageCircle,
 } from 'lucide-react';
 import { ContactInfo, PetType } from '../types';
-import { formatPhoneNumber } from '../utils/formatters';
 
 interface NavbarProps {
   contactInfo: ContactInfo;
@@ -51,7 +50,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showSearchModal, setShowSearchModal] = useState(false);
 
   const handleNavClick = (section: 'catalog' | 'about' | 'blog' | 'contact') => {
     onNavigate(section);
@@ -73,408 +71,440 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#ECE5DD] shadow-xs">
-      {/* Top Notification Announcement Bar */}
+    <header className="sticky top-0 z-40 bg-white border-b border-[#EAE3D6] shadow-2xs">
+      
+      {/* 1. Top Announcement Header (Dark charcoal bar like reference image) */}
       <div
         id="top-announcement-bar"
-        className="bg-[#1A2620] text-[#EFEBE4] px-4 py-2 text-xs sm:text-sm font-medium flex items-center justify-center text-center overflow-hidden border-b border-[#283830]"
+        className="bg-[#181A19] text-[#EBE5DB] px-4 py-2 text-xs font-medium border-b border-white/5"
       >
-        <div className="flex items-center justify-center gap-2.5 sm:gap-4 text-xs sm:text-[13px] tracking-wide text-white/90">
-          <span className="inline-flex items-center gap-1.5 font-medium">
-            <span>🚚</span> Envío gratis en compras superiores a $150.000 COP
-          </span>
-          <span className="text-white/40 hidden sm:inline">|</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 font-medium">
-            <span>🤍</span> Hecho con amor para ellos <span>🐾</span>
-          </span>
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          {/* Left: Free Shipping promo */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm select-none">🚚</span>
+            <span>
+              Envíos gratis en compras superiores a $150.000 COP{' '}
+              <button
+                onClick={() => {
+                  const el = document.getElementById('catalog-products-container');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="underline text-stone-300 hover:text-white font-semibold ml-1 cursor-pointer"
+              >
+                Ver detalles
+              </button>
+            </span>
+          </div>
+
+          {/* Right: Currency / Country & Social Links */}
+          <div className="hidden md:flex items-center gap-4 text-[#A8AFA9] text-[11px]">
+            <div className="flex items-center gap-1 text-[#E0DDD5]">
+              <Globe className="w-3.5 h-3.5 text-[#6B7B3E]" />
+              <span>Colombia (COP $)</span>
+            </div>
+            <span className="text-white/20">|</span>
+            <div className="flex items-center gap-2.5">
+              <a
+                href={contactInfo.instagramUrl || 'https://instagram.com'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+                title="Instagram"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={contactInfo.facebookUrl || 'https://facebook.com'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors"
+                title="Facebook"
+              >
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href={`https://wa.me/57${contactInfo.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-emerald-400 transition-colors"
+                title="WhatsApp Directo"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Main Header Container */}
+      {/* 2. Main Middle Navigation: Brand Logo + Center Pill Search + Right Actions */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 sm:h-24 gap-4">
+        <div className="flex items-center justify-between h-20 gap-4 sm:gap-8">
           
-          {/* Brand Logo - Exact layout from Reference Image */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Brand Logo matching Lunary style with modern editorial font */}
+          <div className="shrink-0">
             <button
               id="brand-logo-button"
               onClick={() => handleNavClick('catalog')}
-              className="flex flex-col items-center group text-left pt-1 focus:outline-none"
+              className="flex items-center gap-1.5 text-left group focus:outline-none cursor-pointer"
             >
-              {/* LUNARY with paw on top-right */}
-              <div className="relative flex items-center justify-center">
-                <span className="text-2xl sm:text-3xl font-black tracking-[0.24em] text-[#1C1F1E] font-sans leading-none pl-1 group-hover:text-[#B97A48] transition-colors select-none">
-                  LUNARY
+              <div className="flex items-baseline">
+                <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#1C1F1E] group-hover:text-[#6B7B3E] transition-colors">
+                  lunary
                 </span>
-                <span className="absolute -top-3.5 right-0 text-sm select-none text-[#1C1F1E] group-hover:scale-110 transition-transform">
+                <span className="text-[#6B7B3E] text-xl font-bold ml-0.5 group-hover:rotate-12 transition-transform select-none">
                   🐾
                 </span>
-              </div>
-              
-              {/* —— WORLD PETS —— */}
-              <div className="w-full flex items-center justify-center gap-1.5 mt-1">
-                <span className="h-[1.5px] w-3.5 bg-[#1C1F1E]/80"></span>
-                <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.22em] text-[#1C1F1E] uppercase leading-none pl-0.5 select-none whitespace-nowrap">
-                  WORLD PETS
-                </span>
-                <span className="h-[1.5px] w-3.5 bg-[#1C1F1E]/80"></span>
               </div>
             </button>
           </div>
 
-          {/* Desktop Navigation Links (Center) */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-9">
-            <button
-              id="nav-inicio"
-              onClick={() => handleNavClick('catalog')}
-              className="relative py-2 text-sm lg:text-[15px] font-semibold transition-colors group"
-            >
-              <span className={activeSection === 'catalog' ? 'text-[#1C1F1E] font-bold' : 'text-[#4A4F4C] hover:text-[#1C1F1E]'}>
-                Inicio
-              </span>
-              {activeSection === 'catalog' && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2.5px] bg-[#C68748] rounded-full" />
+          {/* Center Search Input with clean Pill shape */}
+          <div className="hidden sm:flex flex-1 max-w-lg mx-auto">
+            <div className="relative w-full">
+              <input
+                id="navbar-search-input"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Buscar por alimento, juguete, accesorio o marca..."
+                className="w-full bg-[#F5F2EB] hover:bg-[#EFECE4] focus:bg-white text-xs sm:text-sm text-[#1C1F1E] placeholder:text-[#8D928E] pl-10 pr-9 py-2.5 rounded-full border border-[#E2DBD0] focus:border-[#6B7B3E] focus:outline-none transition-all shadow-2xs"
+              />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8D928E] pointer-events-none" />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-xs cursor-pointer"
+                >
+                  ✕
+                </button>
               )}
-            </button>
+            </div>
+          </div>
 
-            <button
-              id="nav-tienda"
-              onClick={() => handleNavClick('catalog')}
-              className="py-2 text-sm lg:text-[15px] font-semibold text-[#4A4F4C] hover:text-[#1C1F1E] transition-colors"
-            >
-              Tienda
-            </button>
-
-            <button
-              id="nav-categorias"
-              onClick={handleCategoriesClick}
-              className="py-2 text-sm lg:text-[15px] font-semibold text-[#4A4F4C] hover:text-[#1C1F1E] flex items-center gap-1 transition-colors group"
-            >
-              <span>Categorías</span>
-              <ChevronDown className="w-4 h-4 text-[#7C827E] group-hover:text-[#1C1F1E] transition-transform group-hover:translate-y-0.5" />
-            </button>
-
-            <button
-              id="nav-nosotros"
-              onClick={() => handleNavClick('about')}
-              className="relative py-2 text-sm lg:text-[15px] font-semibold transition-colors"
-            >
-              <span className={activeSection === 'about' ? 'text-[#1C1F1E] font-bold' : 'text-[#4A4F4C] hover:text-[#1C1F1E]'}>
-                Nosotros
-              </span>
-              {activeSection === 'about' && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2.5px] bg-[#C68748] rounded-full" />
-              )}
-            </button>
-
-            <button
-              id="nav-blog"
-              onClick={() => handleNavClick('blog')}
-              className="relative py-2 text-sm lg:text-[15px] font-semibold transition-colors"
-            >
-              <span className={activeSection === 'blog' ? 'text-[#1C1F1E] font-bold' : 'text-[#4A4F4C] hover:text-[#1C1F1E]'}>
-                Blog
-              </span>
-              {activeSection === 'blog' && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2.5px] bg-[#C68748] rounded-full" />
-              )}
-            </button>
-
-            <button
-              id="nav-contacto"
-              onClick={() => handleNavClick('contact')}
-              className="relative py-2 text-sm lg:text-[15px] font-semibold transition-colors"
-            >
-              <span className={activeSection === 'contact' ? 'text-[#1C1F1E] font-bold' : 'text-[#4A4F4C] hover:text-[#1C1F1E]'}>
-                Contacto
-              </span>
-              {activeSection === 'contact' && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2.5px] bg-[#C68748] rounded-full" />
-              )}
-            </button>
-
-            {onOpenCalculator && (
-              <button
-                id="nav-food-calculator-btn"
-                onClick={onOpenCalculator}
-                className="py-1.5 px-3 rounded-full text-xs font-bold bg-[#FAF6F0] border border-[#DED7CB] hover:bg-[#EFE9DF] text-[#1C1F1E] flex items-center gap-1.5 shadow-2xs transition-all hover:scale-103"
-                title="Calculadora de Porciones de Alimento"
-              >
-                <span>🥣</span>
-                <span>Calculadora</span>
-              </button>
-            )}
-
-            {onOpenTracker && (
-              <button
-                id="nav-order-tracker-btn"
-                onClick={onOpenTracker}
-                className="py-1.5 px-3 rounded-full text-xs font-bold bg-[#EBF5FF] border border-[#BBE3FB] hover:bg-[#D9EDFE] text-[#033B69] flex items-center gap-1.5 shadow-2xs transition-all hover:scale-103"
-                title="Rastrear Estado de Pedido"
-              >
-                <span>📦</span>
-                <span>Rastrear Pedido</span>
-              </button>
-            )}
-
-            {onOpenVirtualVet && (
-              <button
-                id="nav-virtual-vet-btn"
-                onClick={onOpenVirtualVet}
-                className="py-1.5 px-3 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 text-emerald-900 flex items-center gap-1.5 shadow-2xs transition-all hover:scale-103"
-                title="Asesor Veterinario y Nutricional con IA"
-              >
-                <span>🩺</span>
-                <span>Veterinario AI</span>
-              </button>
-            )}
-          </nav>
-
-          {/* Right Action Icons: Search, User / Admin, Cart */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          {/* Right Action Controls: Login / Admin, Cart, and "Únete al club" Button */}
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             
-            {/* Search Icon Button */}
-            <button
-              id="navbar-search-btn"
-              onClick={() => setShowSearchModal(!showSearchModal)}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-[#1C1F1E] hover:bg-[#F2ECE3] transition-colors"
-              aria-label="Buscar productos"
-              title="Buscar en la tienda"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* User / Admin Portal Button */}
+            {/* Account / Admin Portal Button */}
             <button
               id="open-admin-portal-button"
               onClick={onOpenAdmin}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors relative ${
+              className={`flex items-center gap-1.5 py-1.5 px-2.5 sm:px-3 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 isAdminLoggedIn
-                  ? 'bg-emerald-100 text-emerald-800 ring-2 ring-emerald-500'
-                  : 'text-[#1C1F1E] hover:bg-[#F2ECE3]'
+                  ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-500'
+                  : 'text-[#4A4F4C] hover:text-[#1C1F1E] hover:bg-[#F5F2EB]'
               }`}
-              title={isAdminLoggedIn ? 'Panel de Administración (Conectado)' : 'Cuenta / Iniciar Sesión Administrador'}
-              aria-label="Cuenta de administrador"
+              title={isAdminLoggedIn ? 'Panel de Administración (Conectado)' : 'Cuenta / Iniciar Sesión'}
             >
-              <User className="w-5 h-5" />
-              {isAdminLoggedIn && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              )}
+              <User className="w-4 h-4" />
+              <span className="hidden md:inline">
+                {isAdminLoggedIn ? 'Admin' : 'Mi Cuenta'}
+              </span>
             </button>
 
-            {/* Shopping Cart Drawer Trigger */}
+            {/* Shopping Cart Trigger */}
             <button
               id="open-cart-button"
-              onClick={() => onOpenCart()}
-              className="relative w-10 h-10 rounded-full flex items-center justify-center text-[#1C1F1E] hover:bg-[#F2ECE3] transition-colors"
-              aria-label="Abrir carrito de compras"
-              title="Carrito de compras"
+              onClick={onOpenCart}
+              className="flex items-center gap-2 py-1.5 px-3 rounded-full text-xs font-semibold text-[#1C1F1E] hover:bg-[#F5F2EB] transition-colors relative cursor-pointer"
+              title="Ver carrito de compras"
             >
-              <ShoppingBag className="w-5 h-5" />
-              {cartCount > 0 && (
-                <span
-                  id="cart-badge-count"
-                  className="absolute -top-0.5 -right-0.5 bg-[#C68748] text-white text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs animate-in zoom-in"
-                >
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
+              <div className="relative">
+                <ShoppingBag className="w-5 h-5 text-[#1C1F1E]" />
+                {cartCount > 0 && (
+                  <span
+                    id="cart-badge-count"
+                    className="absolute -top-1.5 -right-2 bg-[#6B7B3E] text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-2xs"
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden sm:inline font-bold">Carrito</span>
             </button>
 
-            {/* Mobile menu hamburger */}
+            {/* Club Lunary Pill Button (matching "Join the pack" in reference) */}
+            <button
+              id="join-the-pack-pill-btn"
+              onClick={() => {
+                const el = document.getElementById('catalog-products-container');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="hidden lg:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#6B7B3E] hover:bg-[#586731] text-white text-xs font-bold transition-all shadow-2xs hover:scale-102 cursor-pointer"
+            >
+              <span>🐾</span>
+              <span>Club Lunary</span>
+            </button>
+
+            {/* Mobile Menu Hamburger */}
             <button
               id="mobile-menu-toggle"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-10 h-10 rounded-full flex items-center justify-center text-[#1C1F1E] hover:bg-[#F2ECE3] transition-colors"
-              aria-label="Abrir menú de navegación móvil"
+              className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-[#1C1F1E] hover:bg-[#F5F2EB] transition-colors cursor-pointer"
+              aria-label="Abrir menú"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
           </div>
+
         </div>
 
-        {/* Inline Search Bar (Expands smoothly on click or search active) */}
-        {(showSearchModal || searchQuery) && (
-          <div className="pb-3 pt-1 animate-in fade-in slide-in-from-top-2">
-            <div className="relative w-full max-w-xl mx-auto">
-              <input
-                id="search-input-desktop"
-                type="text"
-                autoFocus
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Buscar alimentos, juguetes, camas, shampoo, accesorios..."
-                className="w-full bg-[#FAF8F5] focus:bg-white text-[#1C1F1E] placeholder:text-[#8E9390] text-sm pl-10 pr-10 py-2.5 rounded-full border border-[#DDD5C9] focus:border-[#1E2B24] focus:ring-2 focus:ring-[#1E2B24]/10 outline-none transition-all"
-              />
-              <Search className="w-4 h-4 text-[#8E9390] absolute left-3.5 top-1/2 -translate-y-1/2" />
+        {/* Mobile Search Bar if on mobile screen */}
+        <div className="sm:hidden pb-3">
+          <div className="relative w-full">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Buscar en Lunary..."
+              className="w-full bg-[#F5F2EB] text-xs text-[#1C1F1E] placeholder:text-[#8D928E] pl-9 pr-8 py-2 rounded-full border border-[#E2DBD0] focus:border-[#6B7B3E] focus:outline-none"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8D928E]" />
+            {searchQuery && (
               <button
-                id="close-search-btn"
-                onClick={() => {
-                  onSearchChange('');
-                  setShowSearchModal(false);
-                }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#707572] hover:text-[#1C1F1E] text-xs bg-[#EAE3D6] hover:bg-[#DFD5C6] rounded-full w-5 h-5 flex items-center justify-center"
+                type="button"
+                onClick={() => onSearchChange('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"
               >
-                ×
+                ✕
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Pet Filter Pills (Todos / Perros / Gatos) */}
-        <div className="py-2.5 border-t border-[#ECE5DD] flex items-center justify-between overflow-x-auto no-scrollbar gap-2">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="text-xs font-bold text-[#707572] uppercase tracking-wider hidden sm:inline mr-1">
-              Ver para:
-            </span>
-            <button
-              id="filter-pet-ambos"
-              onClick={() => onSelectPetType('ambos')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                selectedPetType === 'ambos'
-                  ? 'bg-[#1E2B24] text-white shadow-xs scale-102'
-                  : 'bg-[#EFE9DF] text-[#4F5551] hover:bg-[#E4DDD1]'
-              }`}
-            >
-              <span>🐾</span>
-              <span>Todos</span>
-            </button>
-            <button
-              id="filter-pet-perro"
-              onClick={() => onSelectPetType('perro')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                selectedPetType === 'perro'
-                  ? 'bg-[#B97A48] text-white shadow-xs scale-102 ring-2 ring-[#B97A48]/30'
-                  : 'bg-[#F6EFE6] text-[#7A4B23] hover:bg-[#EEDDCC] border border-[#E3D3C1]'
-              }`}
-            >
-              <Dog className="w-3.5 h-3.5" />
-              <span>🐶 Perros</span>
-            </button>
-            <button
-              id="filter-pet-gato"
-              onClick={() => onSelectPetType('gato')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                selectedPetType === 'gato'
-                  ? 'bg-[#4F6457] text-white shadow-xs scale-102 ring-2 ring-[#4F6457]/30'
-                  : 'bg-[#EFF3F0] text-[#365042] hover:bg-[#E0E9E3] border border-[#D1DED6]'
-              }`}
-            >
-              <Cat className="w-3.5 h-3.5" />
-              <span>🐱 Gatos</span>
-            </button>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-4 text-xs font-medium text-[#707572]">
-            <span className="flex items-center gap-1 text-[#2B4E3C]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2B4E3C]" />
-              Pago 100% Seguro por Wompi
-            </span>
-            <span className="flex items-center gap-1 text-[#8C542B]">
-              <Heart className="w-3.5 h-3.5 text-[#B97A48] fill-[#B97A48]" />
-              Calidad Garantizada
-            </span>
+            )}
           </div>
         </div>
 
       </div>
 
+      {/* 3. Sub-Navigation Bar matching reference image secondary navigation */}
+      <div className="hidden md:block border-t border-[#EAE3D6] bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-11 text-xs lg:text-[13px] font-semibold text-[#4A4F4C]">
+            
+            {/* Left Nav Links */}
+            <div className="flex items-center gap-6 lg:gap-8">
+              <button
+                onClick={() => handleNavClick('catalog')}
+                className={`transition-colors py-2 cursor-pointer ${
+                  activeSection === 'catalog' && !selectedPetType
+                    ? 'text-[#1C1F1E] font-bold border-b-2 border-[#6B7B3E]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                Ver todo
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectPetType('perro');
+                  handleNavClick('catalog');
+                }}
+                className={`transition-colors py-2 cursor-pointer ${
+                  selectedPetType === 'perro'
+                    ? 'text-[#6B7B3E] font-bold border-b-2 border-[#6B7B3E]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                🐶 Perros
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectPetType('gato');
+                  handleNavClick('catalog');
+                }}
+                className={`transition-colors py-2 cursor-pointer ${
+                  selectedPetType === 'gato'
+                    ? 'text-[#B96A4C] font-bold border-b-2 border-[#B96A4C]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                🐱 Gatos
+              </button>
+
+              <button
+                onClick={handleCategoriesClick}
+                className="hover:text-[#1C1F1E] transition-colors py-2 flex items-center gap-1 cursor-pointer"
+              >
+                <span>Categorías</span>
+                <ChevronDown className="w-3.5 h-3.5 text-[#8D928E]" />
+              </button>
+
+              <button
+                onClick={() => handleNavClick('about')}
+                className={`transition-colors py-2 cursor-pointer ${
+                  activeSection === 'about'
+                    ? 'text-[#1C1F1E] font-bold border-b-2 border-[#6B7B3E]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                Nosotros
+              </button>
+
+              <button
+                onClick={() => handleNavClick('blog')}
+                className={`transition-colors py-2 cursor-pointer ${
+                  activeSection === 'blog'
+                    ? 'text-[#1C1F1E] font-bold border-b-2 border-[#6B7B3E]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                Blog
+              </button>
+
+              <button
+                onClick={() => handleNavClick('contact')}
+                className={`transition-colors py-2 cursor-pointer ${
+                  activeSection === 'contact'
+                    ? 'text-[#1C1F1E] font-bold border-b-2 border-[#6B7B3E]'
+                    : 'hover:text-[#1C1F1E]'
+                }`}
+              >
+                Contacto
+              </button>
+            </div>
+
+            {/* Right Tools & Services Links */}
+            <div className="flex items-center gap-4 lg:gap-5">
+              {onOpenCalculator && (
+                <button
+                  onClick={onOpenCalculator}
+                  className="hover:text-[#6B7B3E] transition-colors flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <span>🥣</span>
+                  <span>Calculadora</span>
+                </button>
+              )}
+
+              {onOpenTracker && (
+                <button
+                  onClick={onOpenTracker}
+                  className="hover:text-blue-700 transition-colors flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <span>📦</span>
+                  <span>Rastrear Pedido</span>
+                </button>
+              )}
+
+              {onOpenVirtualVet && (
+                <button
+                  onClick={onOpenVirtualVet}
+                  className="hover:text-emerald-700 transition-colors flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  <span>🩺</span>
+                  <span>Veterinario AI</span>
+                </button>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div
-          id="mobile-navigation-drawer"
-          className="md:hidden border-t border-[#ECE5DD] bg-white px-4 pt-3 pb-6 space-y-4 shadow-xl animate-in slide-in-from-top-2"
-        >
-          <div className="grid grid-cols-2 gap-2 pt-2">
+        <div className="md:hidden border-t border-[#EAE3D6] bg-white px-5 py-4 space-y-3 animate-in slide-in-from-top-2">
+          <div className="flex flex-col gap-2.5 text-sm font-semibold text-[#1C1F1E]">
             <button
-              id="mobile-nav-inicio"
               onClick={() => handleNavClick('catalog')}
-              className={`p-3 rounded-xl text-left text-sm font-bold border transition-colors ${
-                activeSection === 'catalog'
-                  ? 'bg-[#F4EFE6] border-[#C68748] text-[#1C1F1E]'
-                  : 'bg-[#FAF8F5] border-transparent text-[#4A4F4C]'
-              }`}
+              className="text-left py-2 border-b border-stone-100 flex items-center justify-between"
             >
-              🏠 Inicio
+              <span>Ver Catálogo Completo</span>
+              <span>→</span>
             </button>
+            <div className="grid grid-cols-2 gap-2 py-1">
+              <button
+                onClick={() => {
+                  onSelectPetType('perro');
+                  handleNavClick('catalog');
+                }}
+                className={`p-2 rounded-xl text-center border font-bold text-xs ${
+                  selectedPetType === 'perro'
+                    ? 'bg-[#EDF3E8] border-[#6B7B3E] text-[#6B7B3E]'
+                    : 'bg-[#FAF8F5] border-[#EAE3D6] text-[#4A4F4C]'
+                }`}
+              >
+                🐶 Sección Perros
+              </button>
+              <button
+                onClick={() => {
+                  onSelectPetType('gato');
+                  handleNavClick('catalog');
+                }}
+                className={`p-2 rounded-xl text-center border font-bold text-xs ${
+                  selectedPetType === 'gato'
+                    ? 'bg-[#FAF0E7] border-[#B96A4C] text-[#B96A4C]'
+                    : 'bg-[#FAF8F5] border-[#EAE3D6] text-[#4A4F4C]'
+                }`}
+              >
+                🐱 Sección Gatos
+              </button>
+            </div>
             <button
-              id="mobile-nav-tienda"
-              onClick={() => handleNavClick('catalog')}
-              className="p-3 rounded-xl text-left text-sm font-semibold bg-[#FAF8F5] text-[#4A4F4C]"
-            >
-              🛍️ Tienda
-            </button>
-            <button
-              id="mobile-nav-categorias"
               onClick={handleCategoriesClick}
-              className="p-3 rounded-xl text-left text-sm font-semibold bg-[#FAF8F5] text-[#4A4F4C]"
+              className="text-left py-2 border-b border-stone-100 flex items-center justify-between"
             >
-              📂 Categorías
+              <span>Explorar Categorías</span>
+              <ChevronDown className="w-4 h-4 text-stone-400" />
             </button>
             <button
-              id="mobile-nav-nosotros"
               onClick={() => handleNavClick('about')}
-              className="p-3 rounded-xl text-left text-sm font-semibold bg-[#FAF8F5] text-[#4A4F4C]"
+              className="text-left py-2 border-b border-stone-100"
             >
-              🐾 Nosotros
+              Sobre Nosotros
             </button>
             <button
-              id="mobile-nav-blog"
               onClick={() => handleNavClick('blog')}
-              className="p-3 rounded-xl text-left text-sm font-semibold bg-[#FAF8F5] text-[#4A4F4C]"
+              className="text-left py-2 border-b border-stone-100"
             >
-              📖 Blog
+              Blog & Consejos
             </button>
             <button
-              id="mobile-nav-contacto"
               onClick={() => handleNavClick('contact')}
-              className="p-3 rounded-xl text-left text-sm font-semibold bg-[#FAF8F5] text-[#4A4F4C]"
+              className="text-left py-2 border-b border-stone-100"
             >
-              📞 Contacto
+              Contacto & WhatsApp
             </button>
+          </div>
+
+          {/* Interactive Tools in mobile menu */}
+          <div className="pt-2 border-t border-stone-100 grid grid-cols-3 gap-2">
             {onOpenCalculator && (
               <button
-                id="mobile-nav-calculator"
                 onClick={() => {
-                  onOpenCalculator();
                   setMobileMenuOpen(false);
+                  onOpenCalculator();
                 }}
-                className="col-span-2 p-3 rounded-xl text-left text-sm font-bold bg-[#FAF6F0] border border-[#DED7CB] text-[#1C1F1E] flex items-center justify-between"
+                className="p-2 rounded-xl bg-[#F5F2EB] text-center text-xs font-semibold text-[#1C1F1E]"
               >
-                <div className="flex items-center gap-2">
-                  <span>🥣</span>
-                  <span>Calculadora de Racionamiento</span>
-                </div>
-                <span className="text-[10px] bg-amber-200/80 text-amber-950 px-2 py-0.5 rounded-full font-bold">NUEVO</span>
+                🥣 Calculadora
+              </button>
+            )}
+            {onOpenTracker && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenTracker();
+                }}
+                className="p-2 rounded-xl bg-[#EBF5FF] text-center text-xs font-semibold text-[#033B69]"
+              >
+                📦 Rastrear
+              </button>
+            )}
+            {onOpenVirtualVet && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenVirtualVet();
+                }}
+                className="p-2 rounded-xl bg-emerald-50 text-center text-xs font-semibold text-emerald-900"
+              >
+                🩺 Vet AI
               </button>
             )}
           </div>
-
-          <div className="pt-2 border-t border-[#ECE5DD] flex flex-col gap-2">
-            <a
-              id="mobile-whatsapp-direct-link"
-              href={`https://wa.me/57${(contactInfo?.whatsapp || '3214231616').replace(/\D/g, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 py-2.5 bg-[#23382D] text-white rounded-xl font-bold text-sm"
-            >
-              <span>WhatsApp: {formatPhoneNumber(contactInfo?.whatsapp)}</span>
-            </a>
-            <button
-              id="mobile-admin-access-btn"
-              onClick={() => {
-                onOpenAdmin();
-                setMobileMenuOpen(false);
-              }}
-              className="flex items-center justify-center gap-2 py-2.5 bg-[#1E2B24] text-white rounded-xl font-bold text-sm"
-            >
-              <Lock className="w-4 h-4 text-[#D8A77E]" />
-              <span>{isAdminLoggedIn ? 'Panel de Administración' : 'Acceso Administrador'}</span>
-            </button>
-          </div>
         </div>
       )}
+
     </header>
   );
 };
