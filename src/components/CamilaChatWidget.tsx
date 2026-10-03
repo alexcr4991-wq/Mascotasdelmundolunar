@@ -405,6 +405,8 @@ export const CamilaChatWidget: React.FC<CamilaChatWidgetProps> = ({
     syncLeadToCRM(text, `Mensaje no reconocido: ${text}`);
   };
 
+  const camilaAvatar = contactInfo.camilaAvatarUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80';
+
   return (
     <>
       {/* Floating Trigger Button on Bottom-Right */}
@@ -417,9 +419,14 @@ export const CamilaChatWidget: React.FC<CamilaChatWidgetProps> = ({
           className="relative flex items-center gap-2.5 bg-[#1C2722] hover:bg-[#2A3C34] text-white p-3.5 sm:px-4 sm:py-3.5 rounded-full shadow-xl shadow-black/25 border-2 border-[#FAF8F5] transition-all cursor-pointer group"
           title="Chatear con Camila - Asesora Lunary World Pets"
         >
-          {/* Avatar / Paw Icon with online pulse */}
-          <div className="relative w-8 h-8 rounded-full bg-[#6B7B3E] flex items-center justify-center text-white shrink-0 font-bold text-sm">
-            <span>🐾</span>
+          {/* Avatar / Photo with online pulse */}
+          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#6B7B3E] shrink-0 border border-white/20 shadow-xs">
+            <img
+              src={camilaAvatar}
+              alt="Camila Asesora"
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+            />
             <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#1C2722] animate-pulse" />
           </div>
 
@@ -450,8 +457,13 @@ export const CamilaChatWidget: React.FC<CamilaChatWidgetProps> = ({
             {/* Header: Camila Info + Close */}
             <div className="bg-[#1C2722] text-white p-4 flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full bg-[#6B7B3E] flex items-center justify-center text-lg text-white font-bold shrink-0">
-                  <span>🐾</span>
+                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-[#6B7B3E] shrink-0 border-2 border-emerald-400/40 shadow-xs">
+                  <img
+                    src={camilaAvatar}
+                    alt="Camila Asesora"
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
                   <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#1C2722]" />
                 </div>
                 <div>

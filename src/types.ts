@@ -161,6 +161,7 @@ export interface ContactInfo {
   instagramUrl?: string;
   facebookUrl?: string;
   tiktokUrl?: string;
+  camilaAvatarUrl?: string;
   topBannerText: string;
   deliveryCoverage: string;
   freeShippingMinimum: number;

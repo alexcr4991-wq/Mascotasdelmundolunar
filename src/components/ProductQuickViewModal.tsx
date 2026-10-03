@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { X, Star, ShoppingBag, MessageCircle, Heart, Check, Truck, ShieldCheck, Tag, Layers, Share2, Copy, ExternalLink } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { X, Star, ShoppingBag, MessageCircle, Heart, Check, Truck, ShieldCheck, Tag, Layers, Share2, Copy, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { formatCOP, buildProductInquiryWhatsAppUrl, getProductShareUrl } from '../utils/formatters';
 
@@ -23,17 +23,29 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
   const [justAdded, setJustAdded] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState<string>('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
-    if (product?.variants && product.variants.length > 0) {
-      setSelectedVariantId(product.variants[0].id);
-    } else {
-      setSelectedVariantId('');
+    if (product) {
+      if (product.variants && product.variants.length > 0) {
+        setSelectedVariantId(product.variants[0].id);
+      } else {
+        setSelectedVariantId('');
+      }
+      setQuantity(1);
+      setActiveImageIndex(0);
     }
-    setQuantity(1);
   }, [product]);
 
   if (!product) return null;
+
+  // Gather all available product images (main imageUrl + additionalImages)
+  const allImages = [
+    product.imageUrl,
+    ...(Array.isArray(product.additionalImages) ? product.additionalImages : []),
+  ].filter(Boolean);
+
+  const activeImage = allImages[activeImageIndex] || product.imageUrl;
 
   const hasVariants = Boolean(product.variants && product.variants.length > 0);
   const selectedVariant = hasVariants
@@ -46,8 +58,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
     ? (selectedVariant.stockCount === undefined || selectedVariant.stockCount > 0)
     : product.inStock;
 
-  const [isRedirectingToWompi, setIsRedirectingToWompi] = useState(false);
-
   const handleAdd = () => {
     onAddToCart(product, quantity, selectedVariant);
     setJustAdded(true);
@@ -55,7 +65,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
   };
 
   const handleBuy = () => {
-    setIsRedirectingToWompi(true);
     onDirectBuy(product, quantity, selectedVariant);
   };
 
@@ -88,25 +97,75 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
         <button
           id="close-quickview-btn"
           onClick={onClose}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-[#1C1F1E] flex items-center justify-center shadow-md transition-colors cursor-pointer"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-[#1C1F1E] flex items-center justify-center shadow-md transition-colors cursor-pointer"
         >
           <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 overflow-y-auto flex-1">
-          {/* Left Column: Big Product Image */}
-          <div className="p-4 sm:p-8 bg-[#FAF8F5] flex items-center justify-center border-b md:border-b-0 md:border-r border-[#ECE5DD] relative min-h-[200px] sm:min-h-auto">
+          {/* Left Column: Product Image Gallery & Carousel */}
+          <div className="p-4 sm:p-6 bg-[#FAF8F5] flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#ECE5DD] relative min-h-[260px] sm:min-h-auto">
+            
+            {/* Discount Badge */}
             {discountPercent && (
-              <span className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-black bg-[#D48B4B] text-white shadow-xs">
+              <span className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-black bg-[#D48B4B] text-white shadow-xs">
                 -{discountPercent}% OFF
               </span>
             )}
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="max-h-52 sm:max-h-72 w-full object-contain hover:scale-105 transition-transform duration-300"
-              referrerPolicy="no-referrer"
-            />
+
+            {/* Main Image Viewer */}
+            <div className="relative flex-1 flex items-center justify-center p-4 my-auto">
+              <img
+                src={activeImage}
+                alt={product.name}
+                className="max-h-56 sm:max-h-72 w-full object-contain transition-all duration-300"
+                referrerPolicy="no-referrer"
+              />
+
+              {/* Prev / Next Arrows if multiple images */}
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1))}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#1C1F1E] flex items-center justify-center shadow-md cursor-pointer transition-all"
+                    title="Foto anterior"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setActiveImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-[#1C1F1E] flex items-center justify-center shadow-md cursor-pointer transition-all"
+                    title="Siguiente foto"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Strip for Multi-Photo Sliding / Angles / Colors */}
+            {allImages.length > 1 && (
+              <div className="pt-3 border-t border-[#EAE3D6] flex items-center justify-center gap-2 overflow-x-auto no-scrollbar">
+                {allImages.map((imgUrl, idx) => (
+                  <button
+                    key={`thumb-${idx}`}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`w-12 h-12 rounded-xl overflow-hidden bg-white border-2 transition-all cursor-pointer shrink-0 ${
+                      activeImageIndex === idx
+                        ? 'border-[#6B7B3E] ring-2 ring-[#6B7B3E]/30 scale-105'
+                        : 'border-[#DED7CB] opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`Vista ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Product Info & Actions */}
@@ -148,126 +207,98 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                 )}
               </div>
 
-              <p className="text-xs sm:text-sm text-[#5B605D] leading-relaxed">
-                {product.description || 'Producto seleccionado de alta calidad para consentir a tu mascota.'}
+              {/* Description */}
+              <p className="text-xs sm:text-sm text-[#5C625F] leading-relaxed pt-1">
+                {product.description || 'Producto seleccionado con amor para el bienestar de tu mascota en Lunary World Pets.'}
               </p>
 
-              {/* Variant Selector */}
-              {hasVariants && product.variants && product.variants.length > 0 ? (
-                <div className="p-2.5 sm:p-3 bg-[#FAF8F5] rounded-2xl border border-[#ECE5DD] space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-[#1C1F1E]">
-                    <span className="flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-[#B97A48]" />
-                      Selecciona Presentación / Tamaño / Peso:
-                    </span>
-                    <span className="text-[#B97A48] font-black">{selectedVariant?.name}</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {/* Variants Selector if available */}
+              {hasVariants && product.variants && product.variants.length > 0 && (
+                <div className="pt-2 space-y-1.5">
+                  <label className="block text-xs font-bold text-[#1C1F1E]">
+                    Selecciona una presentación o medida:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
                     {product.variants.map((v) => {
-                      const isSel = v.id === (selectedVariant?.id || selectedVariantId);
+                      const isSel = v.id === selectedVariantId;
                       return (
                         <button
                           key={v.id}
                           type="button"
                           onClick={() => setSelectedVariantId(v.id)}
-                          className={`p-2 rounded-xl text-left border transition-all ${
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                             isSel
-                              ? 'border-[#1C2722] bg-[#1C2722] text-white shadow-xs'
-                              : 'border-[#DED7CB] bg-white text-[#1C1F1E] hover:border-[#1C2722] hover:bg-[#FDFCFB]'
+                              ? 'bg-[#1C2722] text-white shadow-xs'
+                              : 'bg-[#FAF8F5] text-[#4A504C] border border-[#DDD5C9] hover:border-[#1C2722]'
                           }`}
                         >
-                          <p className={`text-xs font-bold ${isSel ? 'text-white' : 'text-[#1C1F1E]'}`}>{v.name}</p>
-                          <p className={`text-[11px] font-black mt-0.5 ${isSel ? 'text-[#FFD8A8]' : 'text-[#B97A48]'}`}>
-                            {formatCOP(v.price)}
-                          </p>
+                          {v.name} ({formatCOP(v.price)})
                         </button>
                       );
                     })}
                   </div>
                 </div>
-              ) : (
-                product.weightOrSize && (
-                  <div className="flex items-center gap-1.5 text-xs text-[#5B605D] pt-1">
-                    <Tag className="w-3.5 h-3.5 text-[#B97A48]" />
-                    <span>Presentación fija: <strong>{product.weightOrSize}</strong></span>
-                  </div>
-                )
               )}
             </div>
 
-            {/* Quantity and Actions */}
-            <div className="space-y-3 pt-3 border-t border-[#ECE5DD] bg-white sticky bottom-0 z-10 pb-2 sm:pb-0">
+            {/* Bottom Actions */}
+            <div className="pt-4 border-t border-[#ECE5DD] space-y-3">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-[#1C1F1E]">Cantidad:</span>
-                <div className="flex items-center border border-[#DDD5C9] rounded-xl overflow-hidden bg-[#FAF8F5]">
+                <div className="flex items-center border border-[#DDD5C9] rounded-xl bg-[#FAF8F5] p-1">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-1 text-sm font-bold text-[#1C1F1E] hover:bg-[#EFE9DF]"
+                    className="w-8 h-8 rounded-lg bg-white font-bold text-sm text-[#1C1F1E] shadow-2xs hover:bg-stone-100 cursor-pointer"
                   >
                     -
                   </button>
-                  <span className="px-3 text-xs font-bold">{quantity}</span>
+                  <span className="w-10 text-center font-bold text-sm text-[#1C1F1E]">
+                    {quantity}
+                  </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-1 text-sm font-bold text-[#1C1F1E] hover:bg-[#EFE9DF]"
+                    className="w-8 h-8 rounded-lg bg-white font-bold text-sm text-[#1C1F1E] shadow-2xs hover:bg-stone-100 cursor-pointer"
                   >
                     +
                   </button>
                 </div>
-                <span className={`text-[11px] sm:text-xs font-semibold ml-auto ${isVariantInStock ? 'text-emerald-700' : 'text-rose-700'}`}>
-                  {isVariantInStock ? '✓ Disponible' : '✗ Agotado'}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  id="quickview-add-cart-btn"
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
                   onClick={handleAdd}
                   disabled={!isVariantInStock}
-                  className={`py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${
+                  className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer ${
                     justAdded
                       ? 'bg-emerald-600 text-white'
-                      : 'bg-[#EAE3D7] hover:bg-[#DCD4C6] text-[#1C1F1E]'
+                      : 'bg-[#EFE9DF] hover:bg-[#E4DDD1] text-[#1C1F1E]'
                   }`}
                 >
                   {justAdded ? (
                     <>
-                      <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>¡Añadido!</span>
+                      <Check className="w-4 h-4" />
+                      <span>¡Agregado al Carrito!</span>
                     </>
                   ) : (
                     <>
-                      <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>Al Carrito</span>
+                      <ShoppingBag className="w-4 h-4 text-[#6B7B3E]" />
+                      <span>Agregar al Carrito</span>
                     </>
                   )}
-                </button>
-
-                <button
-                  type="button"
-                  id="quickview-buy-now-btn"
-                  onClick={handleBuy}
-                  disabled={!isVariantInStock || isRedirectingToWompi}
-                  className="py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold bg-[#1C2722] hover:bg-[#2B3B34] text-white shadow-md flex items-center justify-center gap-1.5 sm:gap-2 hover:scale-101 disabled:opacity-75 cursor-pointer transition-all"
-                >
-                  {isRedirectingToWompi ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-amber-300 border-t-transparent rounded-full animate-spin" />
-                      <span>Pasando a PSE...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="bg-[#002D72] text-white text-[10px] font-black px-1.5 py-0.5 rounded leading-none shadow-2xs">PSE</span>
-                      <span>Pago PSE</span>
-                      <span className="text-amber-300">⚡</span>
-                    </>
-                  )}
-                </button>
+                </motion.button>
               </div>
 
-              {/* Direct WhatsApp ask */}
+              {/* Direct Buy Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={handleBuy}
+                disabled={!isVariantInStock}
+                className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-black bg-[#6B7B3E] hover:bg-[#586731] text-white flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+              >
+                <span>Comprar de inmediato ⚡</span>
+              </motion.button>
+
+              {/* WhatsApp direct inquiry */}
               <a
                 href={buildProductInquiryWhatsAppUrl(whatsappPhone, {
                   ...product,
@@ -276,43 +307,11 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                 })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2 sm:py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 py-1 text-xs font-semibold text-[#2B4E3C] hover:underline"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Pedir o consultar por WhatsApp ({whatsappPhone || '3214231616'})</span>
+                <MessageCircle className="w-3.5 h-3.5 text-[#2B4E3C]" />
+                <span>¿Dudas sobre este producto? Escríbenos por WhatsApp</span>
               </a>
-
-              {/* Extra Social Actions: Copy Direct Link */}
-              <div className="pt-1 border-t border-[#ECE5DD]">
-                <button
-                  type="button"
-                  id="quickview-copy-link-btn"
-                  onClick={() => {
-                    const url = getProductShareUrl(product.id);
-                    navigator.clipboard.writeText(url);
-                    setCopiedLink(true);
-                    setTimeout(() => setCopiedLink(false), 2500);
-                  }}
-                  className={`w-full py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    copiedLink
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                      : 'bg-[#FAF8F5] border-[#DDD5C9] text-[#1C1F1E] hover:bg-[#F2ECE3]'
-                  }`}
-                  title="Copiar link directo de este producto"
-                >
-                  {copiedLink ? (
-                    <>
-                      <Check className="w-3.5 h-3.5" />
-                      <span>¡Enlace Copiado al Portapapeles!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="w-3.5 h-3.5 text-[#B97A48]" />
-                      <span>Copiar Enlace Directo para WhatsApp</span>
-                    </>
-                  )}
-                </button>
-              </div>
             </div>
           </div>
         </div>

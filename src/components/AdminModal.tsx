@@ -369,6 +369,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
   // File input refs for desktop uploads
   const productFileInputRef = useRef<HTMLInputElement | null>(null);
+  const productAdditionalInputRef = useRef<HTMLInputElement | null>(null);
   const blogFileInputRef = useRef<HTMLInputElement | null>(null);
   const aboutFileInputRef = useRef<HTMLInputElement | null>(null);
   const backupFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -412,6 +413,28 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     } catch (err) {
       console.error('Error procesando imagen:', err);
       showToast('No se pudo procesar la imagen seleccionada.', 'error');
+    } finally {
+      setIsCompressingImage(false);
+    }
+  };
+
+  // Additional product image upload handler (multiple angles / colors)
+  const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsCompressingImage(true);
+      showToast('Optimizando foto adicional...', 'info');
+      const compressedDataUrl = await compressImageFile(file, 900, 900, 0.82);
+      setProductForm((prev) => ({
+        ...prev,
+        additionalImages: [...(prev.additionalImages || []), compressedDataUrl],
+      }));
+      showToast('Foto adicional añadida con éxito.', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('No se pudo procesar la foto adicional.', 'error');
     } finally {
       setIsCompressingImage(false);
     }
@@ -514,6 +537,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
         category: productForm.category || 'alimentos',
         petType: productForm.petType || 'ambos',
         imageUrl: productForm.imageUrl || 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=600&q=80',
+        additionalImages: productForm.additionalImages || [],
         inStock: hasValidVariants ? finalStock > 0 : (productForm.inStock ?? true),
         stockCount: finalStock,
         isFeatured: productForm.isFeatured ?? true,
@@ -2732,6 +2756,34 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         />
                       </div>
 
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-[#1C1F1E] mb-1">
+                          👩‍💼 Foto de Camila (Asesora Virtual - URL o Enlace)
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="url"
+                            value={contactForm.camilaAvatarUrl || ''}
+                            onChange={(e) => setContactForm({ ...contactForm, camilaAvatarUrl: e.target.value })}
+                            placeholder="https://images.unsplash.com/photo-..."
+                            className="flex-1 bg-white border border-[#DED7CB] rounded-xl px-3 py-2 text-sm text-[#1C1F1E] outline-none"
+                          />
+                          {contactForm.camilaAvatarUrl && (
+                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#6B7B3E] shrink-0 bg-white shadow-xs">
+                              <img
+                                src={contactForm.camilaAvatarUrl}
+                                alt="Camila Preview"
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[11px] text-[#7A7F7C] block mt-1">
+                          Pega aquí el enlace de la foto de la modelo o asesora que deseas que aparezca en el chat flotante de Camila.
+                        </span>
+                      </div>
+
                       <div>
                         <label className="block text-xs font-semibold text-[#1C1F1E] mb-1">
                           🎵 Enlace / Perfil de TikTok de la Tienda
@@ -4139,6 +4191,78 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                           onChange={(e) => setProductForm({ ...productForm, imageUrl: e.target.value })}
                           placeholder="https://..."
                           className="w-full mt-1 bg-white border border-[#DED7CB] rounded-lg px-2.5 py-1 text-xs text-[#1C1F1E]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Photos Uploader (Multiple angles, colors, sides) */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-[#1C1F1E]">
+                    📸 Fotos Adicionales (Vistas, caras o colores adicionales)
+                  </label>
+
+                  <div className="space-y-3 p-3 bg-[#FAF8F5] rounded-2xl border border-[#ECE5DD]">
+                    <div className="flex flex-wrap gap-2.5">
+                      {(productForm.additionalImages || []).map((imgUrl, idx) => (
+                        <div key={`add_img_${idx}`} className="relative w-16 h-16 rounded-xl bg-white border border-[#DED7CB] overflow-hidden group shadow-2xs">
+                          <img src={imgUrl} alt={`Adicional ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...(productForm.additionalImages || [])];
+                              updated.splice(idx, 1);
+                              setProductForm({ ...productForm, additionalImages: updated });
+                            }}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            title="Eliminar foto"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+
+                      <input
+                        type="file"
+                        ref={productAdditionalInputRef}
+                        accept="image/*"
+                        onChange={handleAdditionalImageUpload}
+                        className="hidden"
+                        id="product-additional-image-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => productAdditionalInputRef.current?.click()}
+                        disabled={isCompressingImage}
+                        className="w-16 h-16 rounded-xl border-2 border-dashed border-[#6B7B3E]/50 hover:border-[#6B7B3E] bg-white text-[#6B7B3E] flex flex-col items-center justify-center text-xs font-bold gap-1 cursor-pointer transition-colors shadow-2xs"
+                        title="Añadir otra foto o color"
+                      >
+                        <Plus className="w-5 h-5" />
+                        <span className="text-[9px]">Añadir</span>
+                      </button>
+                    </div>
+
+                    <div className="text-[11px] text-[#7A807C]">
+                      O añade URL de imagen adicional (presiona Enter para agregar):
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          type="text"
+                          placeholder="https://... (URL de otra foto, ángulo o color)"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const val = (e.target as HTMLInputElement).value.trim();
+                              if (val) {
+                                setProductForm({
+                                  ...productForm,
+                                  additionalImages: [...(productForm.additionalImages || []), val],
+                                });
+                                (e.target as HTMLInputElement).value = '';
+                              }
+                            }
+                          }}
+                          className="flex-1 bg-white border border-[#DED7CB] rounded-lg px-2.5 py-1 text-xs text-[#1C1F1E]"
                         />
                       </div>
                     </div>

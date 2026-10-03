@@ -39,6 +39,7 @@ export const INITIAL_CONTACT_INFO: ContactInfo = {
   instagramUrl: 'https://instagram.com',
   facebookUrl: 'https://facebook.com',
   tiktokUrl: 'https://tiktok.com',
+  camilaAvatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80',
   topBannerText: 'Envío gratis en compras superiores a $150.000 COP | Hecho con amor para ellos',
   deliveryCoverage: 'Envíos rápidos a todo Colombia (Bogotá $6.500 | Fuera de Bogotá $13.500)',
   freeShippingMinimum: 150000,
